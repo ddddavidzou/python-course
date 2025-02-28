@@ -244,123 +244,180 @@
 </body>
 </html>
 
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>汇率转换器</title>
+    <title>实时汇率转换器</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-        h1 {
+        /* 保持原有样式 */
+        .loading {
+            display: none;
             text-align: center;
-            font-size: 24px;
-        }
-        label {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
             margin: 10px 0;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
         }
-        button {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
+        .error {
+            color: red;
             text-align: center;
+            margin: 10px 0;
+        }
+        .last-update {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>汇率转换器</h1>
+    <h1>实时汇率转换器</h1>
 
     <label for="amount">金额:</label>
-    <input type="number" id="amount" placeholder="请输入金额" />
+    <input type="number" id="amount" placeholder="请输入金额" step="0.01" min="0" />
 
     <label for="fromCurrency">从货币:</label>
-    <select id="fromCurrency">
+    <select id="fromCurrency" onchange="updateRates()">
         <option value="USD">美元 (USD)</option>
         <option value="CNY">人民币 (CNY)</option>
         <option value="EUR">欧元 (EUR)</option>
         <option value="JPY">日元 (JPY)</option>
+        <option value="GBP">英镑 (GBP)</option>
+        <option value="AUD">澳元 (AUD)</option>
     </select>
 
     <label for="toCurrency">到货币:</label>
     <select id="toCurrency">
-        <option value="USD">美元 (USD)</option>
         <option value="CNY">人民币 (CNY)</option>
+        <option value="USD">美元 (USD)</option>
         <option value="EUR">欧元 (EUR)</option>
         <option value="JPY">日元 (JPY)</option>
+        <option value="GBP">英镑 (GBP)</option>
+        <option value="AUD">澳元 (AUD)</option>
     </select>
 
     <button onclick="convertCurrency()">转换</button>
 
+    <div class="loading" id="loading">正在获取最新汇率...</div>
     <div class="result" id="result"></div>
+    <div class="last-update" id="lastUpdate"></div>
 </div>
 
 <script>
-    // 模拟汇率数据
-    const exchangeRates = {
-        "USD": { "CNY": 7.2, "EUR": 0.85, "JPY": 110.57 },
-        "CNY": { "USD": 0.14, "EUR": 0.12, "JPY": 15.34 },
-        "EUR": { "USD": 1.18, "CNY": 8.6, "JPY": 130.10 },
-        "JPY": { "USD": 0.009, "CNY": 0.065, "EUR": 0.0077 }
+    // 配置
+    const API_KEY = ' e08799e9739671f6731f7c92'; // 需要替换为您的 API 密钥
+    const BASE_URL = 'https://v6.exchangerate-api.com/v6/';
+    
+    let currentRates = null;
+    let lastUpdateTime = null;
+
+    // 缓存控制
+    const CACHE_DURATION = 1000 * 60 * 30; // 30分钟缓存
+
+    // 初始化
+    window.onload = function() {
+        updateRates();
     };
 
-    // 汇率转换函数
-    function convertCurrency() {
+    // 获取实时汇率
+    async function updateRates() {
+        const fromCurrency = document.getElementById("fromCurrency").value;
+        
+        // 检查缓存
+        if (currentRates && lastUpdateTime && (Date.now() - lastUpdateTime < CACHE_DURATION)) {
+            return;
+        }
+
+        showLoading(true);
+
+        try {
+            const response = await fetch(`${BASE_URL}${API_KEY}/latest/${fromCurrency}`);
+            const data = await response.json();
+
+            if (data.result === "success") {
+                currentRates = data.conversion_rates;
+                lastUpdateTime = Date.now();
+                updateLastUpdateTime();
+            } else {
+                throw new Error(data.error || '获取汇率失败');
+            }
+        } catch (error) {
+            showError('获取汇率失败，请稍后重试');
+            console.error('API错误:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // 转换货币
+    async function convertCurrency() {
         const amount = parseFloat(document.getElementById("amount").value);
         const fromCurrency = document.getElementById("fromCurrency").value;
         const toCurrency = document.getElementById("toCurrency").value;
 
+        // 输入验证
         if (isNaN(amount) || amount <= 0) {
-            document.getElementById("result").innerText = "请输入有效的金额！";
+            showError('请输入有效的金额！');
+            return;
+        }
+
+        if (amount > 999999999) {
+            showError('金额超出限制！');
             return;
         }
 
         if (fromCurrency === toCurrency) {
-            document.getElementById("result").innerText = "选择不同的货币进行转换！";
+            document.getElementById("result").innerHTML = 
+                '<span style="color: orange;">提示：您选择了相同的货币，无需转换。</span>';
             return;
         }
 
-        // 获取转换后的金额
-        const rate = exchangeRates[fromCurrency][toCurrency];
+        // 确保有最新汇率
+        if (!currentRates) {
+            await updateRates();
+        }
+
+        if (!currentRates) {
+            showError('无法获取汇率数据');
+            return;
+        }
+
+        // 计算转换结果
+        const rate = currentRates[toCurrency];
         const convertedAmount = amount * rate;
 
-        document.getElementById("result").innerText = `${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
+        // 显示结果
+        const result = `
+            <div>
+                ${amount.toLocaleString()} ${fromCurrency} = 
+                <strong>${convertedAmount.toFixed(2).toLocaleString()} ${toCurrency}</strong>
+                <br>
+                <small>汇率: 1 ${fromCurrency} = ${rate.toFixed(4)} ${toCurrency}</small>
+            </div>
+        `;
+        
+        document.getElementById("result").innerHTML = result;
+    }
+
+    // 辅助函数
+    function showLoading(show) {
+        document.getElementById("loading").style.display = show ? "block" : "none";
+    }
+
+    function showError(message) {
+        document.getElementById("result").innerHTML = `<div class="error">${message}</div>`;
+    }
+
+    function updateLastUpdateTime() {
+        if (lastUpdateTime) {
+            const timeString = new Date(lastUpdateTime).toLocaleString();
+            document.getElementById("lastUpdate").textContent = `最后更新: ${timeString}`;
+        }
     }
 </script>
 
 </body>
 </html>
-
