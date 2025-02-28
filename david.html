@@ -204,52 +204,52 @@
 </div>
 
 <script>
-    // 模拟 GDP 数据（单位：万亿人民币）
+    // 清理了非法字符后的 GDP 数据（单位：万亿人民币）
     const gdpData = {
-‌        1978‌: 37.07,
-‌        1979‌: 40.84,
-‌        1980‌: 45.96,
-‌        1981‌: 49.33,
-‌        1982‌: 53.91,
-        1983‌: 60.34,
-        1984‌: 73.45,
-        1985‌: 91.29,
-        1986‌: 104.47,
-        1987‌: 122.25,
-‌        1988‌: 152.42,
+        1978: 37.07,
+        1979: 40.84,
+        1980: 45.96,
+        1981: 49.33,
+        1982: 53.91,
+        1983: 60.34,
+        1984: 73.45,
+        1985: 91.29,
+        1986: 104.47,
+        1987: 122.25,
+        1988: 152.42,
         1989: 172.21,
-‌        1990‌: 189.31,
-‌        1991‌: 221.41,
-‌        1992‌: 273.47,
-‌        1993‌: 358.33,
-‌        1994‌: 489.48,
-        1995‌: 613.39,
-        1996‌: 722.27,
-        1997‌: 802.12,
-        1998‌: 859.47,
-        1999‌: 914.38,
-‌        2000‌: 1013.40,
-        2001‌: 1122.37,
-        2002‌: 1217.45,
-        2003‌: 1394.38,
-‌        2004‌: 1642.12,
-‌        2005‌: 1899.47,
-        2006‌: 2226.44,
-        2007‌: 2742.83,
-        2008‌: 3243.00,
-        2009‌: 3545.20,
-        2010‌: 4193.34,
-‌        2011‌: 4957.43,
-        2012‌: 5475.13,
-        2013‌: 5930.10,
-        2014‌: 6436.20,
-        2015‌: 7025.35,
-        2016‌: 7612.32,
+        1990: 189.31,
+        1991: 221.41,
+        1992: 273.47,
+        1993: 358.33,
+        1994: 489.48,
+        1995: 613.39,
+        1996: 722.27,
+        1997: 802.12,
+        1998: 859.47,
+        1999: 914.38,
+        2000: 1013.40,
+        2001: 1122.37,
+        2002: 1217.45,
+        2003: 1394.38,
+        2004: 1642.12,
+        2005: 1899.47,
+        2006: 2226.44,
+        2007: 2742.83,
+        2008: 3243.00,
+        2009: 3545.20,
+        2010: 4193.34,
+        2011: 4957.43,
+        2012: 5475.13,
+        2013: 5930.10,
+        2014: 6436.20,
+        2015: 7025.35,
+        2016: 7612.32,
         2020: 8000.23,
         2021: 11114.3,
         2022: 11231.2,
         2023: 11228.5,
-        2024: 13136.1,
+        2024: 13136.1
     };
 
     // 获取年份的GDP数据
@@ -261,7 +261,7 @@
     function calculateGrowthRate(year) {
         const currentGDP = getGDP(year);
         const previousGDP = getGDP(year - 1);
-        const quarterGDP = getGDP(year - 1.25); // 假设每个季度增长
+        const quarterGDP = getGDP(year - 1); // 假设每个季度增长
         let yearOnYear = null;
         let quarterOnQuarter = null;
 
@@ -279,7 +279,13 @@
     // 生成折线图
     function createChart(gdpList, yearList) {
         const ctx = document.getElementById('gdpChart').getContext('2d');
-        new Chart(ctx, {
+        
+        // 如果已存在图表，销毁它
+        if (window.gdpChartInstance) {
+            window.gdpChartInstance.destroy();
+        }
+
+        window.gdpChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: yearList,
@@ -293,26 +299,15 @@
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        display: true
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
-                    }
+                    legend: { display: true },
+                    tooltip: { mode: 'index', intersect: false }
                 },
                 scales: {
-                    x: { 
-                        title: {
-                            display: true,
-                            text: '年份'
-                        }
+                    x: {
+                        title: { display: true, text: '年份' }
                     },
                     y: {
-                        title: {
-                            display: true,
-                            text: 'GDP（万亿人民币）'
-                        }
+                        title: { display: true, text: 'GDP（万亿人民币）' }
                     }
                 }
             }
@@ -336,9 +331,14 @@
 
         if (yearOnYear !== null) {
             resultText += `同比增长：${yearOnYear.toFixed(2)}%\n`;
+        } else {
+            resultText += `暂无同比数据\n`;
         }
+
         if (quarterOnQuarter !== null) {
             resultText += `环比增长：${quarterOnQuarter.toFixed(2)}%\n`;
+        } else {
+            resultText += `暂无环比数据\n`;
         }
 
         // 输出结果
@@ -354,5 +354,3 @@
 
 </body>
 </html>
-
- 
