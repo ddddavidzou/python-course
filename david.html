@@ -11,125 +11,6 @@
 </body>
 </html>
 
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>汇率转换器</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-            font-size: 24px;
-        }
-        label {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>汇率转换器</h1>
-
-    <label for="amount">金额:</label>
-    <input type="number" id="amount" placeholder="请输入金额" />
-
-    <label for="fromCurrency">从货币:</label>
-    <select id="fromCurrency">
-        <option value="USD">美元 (USD)</option>
-        <option value="CNY">人民币 (CNY)</option>
-        <option value="EUR">欧元 (EUR)</option>
-        <option value="JPY">日元 (JPY)</option>
-    </select>
-
-    <label for="toCurrency">到货币:</label>
-    <select id="toCurrency">
-        <option value="USD">美元 (USD)</option>
-        <option value="CNY">人民币 (CNY)</option>
-        <option value="EUR">欧元 (EUR)</option>
-        <option value="JPY">日元 (JPY)</option>
-    </select>
-
-    <button onclick="convertCurrency()">转换</button>
-
-    <div class="result" id="result"></div>
-</div>
-
-<script>
-    // 模拟汇率数据
-    const exchangeRates = {
-        "USD": { "CNY": 7.2, "EUR": 0.85, "JPY": 110.57 },
-        "CNY": { "USD": 0.14, "EUR": 0.12, "JPY": 15.34 },
-        "EUR": { "USD": 1.18, "CNY": 8.6, "JPY": 130.10 },
-        "JPY": { "USD": 0.009, "CNY": 0.065, "EUR": 0.0077 }
-    };
-
-    // 汇率转换函数
-    function convertCurrency() {
-        const amount = parseFloat(document.getElementById("amount").value);
-        const fromCurrency = document.getElementById("fromCurrency").value;
-        const toCurrency = document.getElementById("toCurrency").value;
-
-        if (isNaN(amount) || amount <= 0) {
-            document.getElementById("result").innerText = "请输入有效的金额！";
-            return;
-        }
-
-        if (fromCurrency === toCurrency) {
-            document.getElementById("result").innerText = "选择不同的货币进行转换！";
-            return;
-        }
-
-        // 获取转换后的金额
-        const rate = exchangeRates[fromCurrency][toCurrency];
-        const convertedAmount = amount * rate;
-
-        document.getElementById("result").innerText = `${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
-    }
-</script>
-
-</body>
-</html>
 
 <!DOCTYPE html>
 <html lang="zh">
@@ -359,3 +240,124 @@
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汇率转换器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+        }
+        label {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>汇率转换器</h1>
+
+    <label for="amount">金额:</label>
+    <input type="number" id="amount" placeholder="请输入金额" />
+
+    <label for="fromCurrency">从货币:</label>
+    <select id="fromCurrency">
+        <option value="USD">美元 (USD)</option>
+        <option value="CNY">人民币 (CNY)</option>
+        <option value="EUR">欧元 (EUR)</option>
+        <option value="JPY">日元 (JPY)</option>
+    </select>
+
+    <label for="toCurrency">到货币:</label>
+    <select id="toCurrency">
+        <option value="USD">美元 (USD)</option>
+        <option value="CNY">人民币 (CNY)</option>
+        <option value="EUR">欧元 (EUR)</option>
+        <option value="JPY">日元 (JPY)</option>
+    </select>
+
+    <button onclick="convertCurrency()">转换</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    // 模拟汇率数据
+    const exchangeRates = {
+        "USD": { "CNY": 7.2, "EUR": 0.85, "JPY": 110.57 },
+        "CNY": { "USD": 0.14, "EUR": 0.12, "JPY": 15.34 },
+        "EUR": { "USD": 1.18, "CNY": 8.6, "JPY": 130.10 },
+        "JPY": { "USD": 0.009, "CNY": 0.065, "EUR": 0.0077 }
+    };
+
+    // 汇率转换函数
+    function convertCurrency() {
+        const amount = parseFloat(document.getElementById("amount").value);
+        const fromCurrency = document.getElementById("fromCurrency").value;
+        const toCurrency = document.getElementById("toCurrency").value;
+
+        if (isNaN(amount) || amount <= 0) {
+            document.getElementById("result").innerText = "请输入有效的金额！";
+            return;
+        }
+
+        if (fromCurrency === toCurrency) {
+            document.getElementById("result").innerText = "选择不同的货币进行转换！";
+            return;
+        }
+
+        // 获取转换后的金额
+        const rate = exchangeRates[fromCurrency][toCurrency];
+        const convertedAmount = amount * rate;
+
+        document.getElementById("result").innerText = `${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
+    }
+</script>
+
+</body>
+</html>
+
