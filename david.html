@@ -136,7 +136,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>打分系统</title>
+    <title>GDP 打分与分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -144,7 +145,7 @@
             text-align: center;
         }
         .container {
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
             border: 1px solid #ddd;
@@ -155,7 +156,17 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
-        .button {
+        .input-container {
+            margin-bottom: 20px;
+        }
+        .input-container input {
+            padding: 8px;
+            font-size: 16px;
+            width: 150px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
             padding: 10px 20px;
             font-size: 16px;
             background-color: #4CAF50;
@@ -164,40 +175,145 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        .button:hover {
+        button:hover {
             background-color: #45a049;
         }
         .result {
             margin-top: 20px;
             font-size: 18px;
         }
+        canvas {
+            margin-top: 30px;
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>随机打分系统</h1>
-    <button class="button" onclick="generateScore()">给一个人打分</button>
+    <h1>GDP 数据分析</h1>
+    <div class="input-container">
+        <label for="year">请输入年份:</label>
+        <input type="number" id="year" placeholder="请输入年份" />
+        <button onclick="showGDP()">查看 GDP 数据</button>
+    </div>
 
     <div class="result" id="result"></div>
+
+    <canvas id="gdpChart"></canvas>
 </div>
 
 <script>
-    // 名字列表
-    const names = ["张三", "李四", "王五", "赵六", "钱七", "孙八", "周九"];
+    // 模拟 GDP 数据（单位：万亿人民币）
+    const gdpData = {
+        2020: 101.6, // 例子：2020年GDP为101.6万亿
+        2021: 114.3,
+        2022: 121.2,
+        2023: 128.5,
+        2024: 136.1,
+    };
 
-    // 随机选择名字并打分
-    function generateScore() {
-        // 随机选择一个名字
-        const randomName = names[Math.floor(Math.random() * names.length)];
+    // 获取年份的GDP数据
+    function getGDP(year) {
+        return gdpData[year] || null;
+    }
 
-        // 随机打分（0到100）
-        const randomScore = Math.floor(Math.random() * 101);
+    // 计算同比、环比
+    function calculateGrowthRate(year) {
+        const currentGDP = getGDP(year);
+        const previousGDP = getGDP(year - 1);
+        const quarterGDP = getGDP(year - 1.25); // 假设每个季度增长
+        let yearOnYear = null;
+        let quarterOnQuarter = null;
 
-        // 显示结果
-        document.getElementById("result").innerText = `${randomName} 的得分是：${randomScore} 分`;
+        if (currentGDP && previousGDP) {
+            yearOnYear = ((currentGDP - previousGDP) / previousGDP) * 100;
+        }
+
+        if (currentGDP && quarterGDP) {
+            quarterOnQuarter = ((currentGDP - quarterGDP) / quarterGDP) * 100;
+        }
+
+        return { yearOnYear, quarterOnQuarter };
+    }
+
+    // 生成折线图
+    function createChart(gdpList, yearList) {
+        const ctx = document.getElementById('gdpChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: yearList,
+                datasets: [{
+                    label: 'GDP（万亿人民币）',
+                    data: gdpList,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: { 
+                        title: {
+                            display: true,
+                            text: '年份'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'GDP（万亿人民币）'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 展示 GDP 数据和计算结果
+    function showGDP() {
+        const year = parseInt(document.getElementById("year").value);
+        const gdp = getGDP(year);
+
+        if (!gdp) {
+            document.getElementById("result").innerText = `没有找到${year}年的GDP数据！`;
+            return;
+        }
+
+        // 计算同比、环比
+        const { yearOnYear, quarterOnQuarter } = calculateGrowthRate(year);
+
+        let resultText = `${year}年GDP：${gdp}万亿人民币\n`;
+
+        if (yearOnYear !== null) {
+            resultText += `同比增长：${yearOnYear.toFixed(2)}%\n`;
+        }
+        if (quarterOnQuarter !== null) {
+            resultText += `环比增长：${quarterOnQuarter.toFixed(2)}%\n`;
+        }
+
+        // 输出结果
+        document.getElementById("result").innerText = resultText;
+
+        // 绘制折线图
+        const years = Object.keys(gdpData);
+        const gdpList = years.map(y => gdpData[y]);
+
+        createChart(gdpList, years);
     }
 </script>
 
 </body>
 </html>
+
+ 
