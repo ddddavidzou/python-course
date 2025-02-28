@@ -344,10 +344,15 @@
         // 输出结果
         document.getElementById("result").innerText = resultText;
 
-        // 绘制折线图
-        const years = Object.keys(gdpData);
+        // 计算前后十年的年份范围
+        const startYear = Math.max(year - 10, Math.min(...Object.keys(gdpData))); // 避免小于最小年份
+        const endYear = Math.min(year + 10, Math.max(...Object.keys(gdpData))); // 避免大于最大年份
+
+        // 获取对应年份的数据
+        const years = Object.keys(gdpData).filter(y => y >= startYear && y <= endYear);
         const gdpList = years.map(y => gdpData[y]);
 
+        // 绘制折线图
         createChart(gdpList, years);
     }
 </script>
