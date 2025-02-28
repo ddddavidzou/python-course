@@ -131,3 +131,73 @@
 </body>
 </html>
 
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打分系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>随机打分系统</h1>
+    <button class="button" onclick="generateScore()">给一个人打分</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    // 名字列表
+    const names = ["张三", "李四", "王五", "赵六", "钱七", "孙八", "周九"];
+
+    // 随机选择名字并打分
+    function generateScore() {
+        // 随机选择一个名字
+        const randomName = names[Math.floor(Math.random() * names.length)];
+
+        // 随机打分（0到100）
+        const randomScore = Math.floor(Math.random() * 101);
+
+        // 显示结果
+        document.getElementById("result").innerText = `${randomName} 的得分是：${randomScore} 分`;
+    }
+</script>
+
+</body>
+</html>
